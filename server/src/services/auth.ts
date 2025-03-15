@@ -1,4 +1,5 @@
-import type { Request, Response, NextFunction } from 'express';
+// import type { Request, Response, NextFunction } from 'express';
+import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
@@ -10,25 +11,26 @@ interface JwtPayload {
   email: string,
 }
 
-export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
+export const authenticateToken = ({ req }: any) => {
+  let token = req.body.token || req.query.token || req.headers.authorization;
 
-  if (authHeader) {
-    const token = authHeader.split(' ')[1];
-
-    const secretKey = process.env.JWT_SECRET_KEY || '';
-
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        return res.sendStatus(403); // Forbidden
-      }
-
-      req.user = user as JwtPayload;
-      return next();
-    });
-  } else {
-    res.sendStatus(401); // Unauthorized
+  if (req.headers.authorization) {
+    token = token.split(' ').pop().trim();
   }
+
+  if (!token) {
+    return req;
+  }
+
+  try {
+    const { username, email, _id } = jwt.verify(token, process.env.JWT_SECRET_KEY || '') as JwtPayload;
+    req.user = { username, email, _id };
+  } catch (error) {
+    console.error(error);
+    throw new GraphQLError('Invalid token');
+  }
+
+  return req;
 };
 
 export const signToken = (username: string, email: string, _id: unknown) => {
