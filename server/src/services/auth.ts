@@ -1,12 +1,12 @@
 // import type { Request, Response, NextFunction } from 'express';
-import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
-
 import dotenv from 'dotenv';
+import { GraphQLError } from 'graphql';
+
 dotenv.config();
 
 interface JwtPayload {
-  _id: unknown;
+  _id: string;
   username: string;
   email: string,
 }
@@ -19,23 +19,23 @@ export const authenticateToken = ({ req }: any) => {
   }
 
   if (!token) {
-    return req;
+    return { user: null };
   }
 
   try {
-    const { username, email, _id } = jwt.verify(token, process.env.JWT_SECRET_KEY || '') as JwtPayload;
-    req.user = { username, email, _id };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || '') as JwtPayload;
+    return { user: { _id: decoded._id, username: decoded.username, email: decoded.email } };
   } catch (error) {
     console.error(error);
     throw new GraphQLError('Invalid token');
   }
-
-  return req;
 };
 
-export const signToken = (username: string, email: string, _id: unknown) => {
+export const signToken = (username: string, email: string, _id: string) => {
   const payload = { username, email, _id };
   const secretKey = process.env.JWT_SECRET_KEY || '';
 
   return jwt.sign(payload, secretKey, { expiresIn: '1h' });
 };
+
+export default { authenticateToken, signToken };
