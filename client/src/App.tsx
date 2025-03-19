@@ -4,10 +4,14 @@ import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink } from '@ap
 import Navbar from './components/Navbar';
 import { setContext } from '@apollo/client/link/context';
 
+
+
+
 // Set up the GraphQL API endpoint
 const httpLink = createHttpLink({
-  uri: 'http://localhost:10000/graphql',
+  uri: 'https://book-search-p93r.onrender.com/graphql',
 });
+
 
 // Attach JWT token to each request
 const authLink = setContext((_, { headers }) => {
