@@ -25,7 +25,7 @@ const startApolloServer = async () => {
   await server.start();
   
   app.use(cors({
-  origin: ['http://localhost:3000', 'https://your-deployed-frontend.com'],
+  origin: ['http://localhost:3000', 'https://book-search-p93r.onrender.com'],
   credentials: true, // Allows sending cookies or authentication headers
   }));
   
