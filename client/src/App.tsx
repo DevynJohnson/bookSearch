@@ -3,10 +3,13 @@ import { Outlet } from 'react-router-dom';
 import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import Navbar from './components/Navbar';
 import { setContext } from '@apollo/client/link/context';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Set up the GraphQL API endpoint
 const httpLink = createHttpLink({
-  uri: 'http://localhost:10000/graphql',
+  uri: process.env.VITE_GRAPHQL_URI || 'http://localhost:10000/graphql',
 });
 
 // Attach JWT token to each request
