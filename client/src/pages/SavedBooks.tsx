@@ -34,19 +34,22 @@ const SavedBooks = () => {
 
   const handleDeleteBook = async (bookId: string) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+  
     if (!token) {
       return false;
     }
-
+  
     try {
       const { data } = await removeBookMutation({
         variables: { bookId },
       });
-
+  
       if (data.removeBook.savedBooks.length) {
-        Auth.login(data.removeBook.token);
+        // Keep the token in localStorage if savedBooks exists
+        // Don't log the user out by calling Auth.login unless a new token is returned
+        console.log("Book removed. Saved books updated.");
       } else {
+        // If no savedBooks, remove from localStorage
         removeBookId(bookId);
       }
     } catch (err) {
